@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Login</title>
+  <link rel="stylesheet" href="/assets/css/styles.css">
+</head>
+
+<body>
+  <div class="login-container">
+    <h2>Login</h2>
+    <form id="loginForm" method="POST" action="/login">
+      <div class="form-group">
+        <label for="role">Select Role:</label>
+        <select name="role" id="role" required>
+          <option value="giver">Job Giver</option>
+          <option value="taker">Job Taker</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label for="username">Username:</label>
+        <input type="text" name="username" id="username" required>
+      </div>
+      <div class="form-group">
+        <label for="password">Password:</label>
+        <input type="password" name="password" id="password" required>
+      </div>
+      <button type="submit">Login</button>
+    </form>
+
+    <p>Don't have an account?</p>
+    <a href="./register.html" id="create-profile-link">Create New Profile</a> <!-- Link to register page -->
+  </div>
+
+  <script>
+    // If the role is passed in the URL, pre-select it in the form dropdown
+    const urlParams = new URLSearchParams(window.location.search);
+    const role = urlParams.get('role');
+    if (role) {
+      document.getElementById('role').value = role; // Set the role in the dropdown based on URL
+    }
+  </script>
+
+  <script src="/assets/js/login.js"></script>
+</body>
+
+</html>

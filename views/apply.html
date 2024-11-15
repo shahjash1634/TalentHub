@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="main.css"> <!-- Link to external CSS -->
+  <title>Available Jobs</title>
+</head>
+
+<body>
+  <h1>Available Jobs</h1>
+
+  <!-- Search input field -->
+  <input type="text" id="searchInput" placeholder="Search jobs..." />
+
+  <!-- Job cards container -->
+  <div id="jobCards">
+    <!-- Job cards will be dynamically generated here -->
+  </div>
+
+  <script>
+    // Array to hold job data
+    let jobs = [];
+
+    // Fetch job listings from the server and display them
+    fetch('/apply')
+      .then(response => response.json())
+      .then(data => {
+        if (data.error) {
+          alert(data.error);
+          return;
+        }
+        jobs = data; // Store fetched jobs into the 'jobs' array
+        displayJobs(jobs); // Call display function to show jobs
+      })
+      .catch(error => {
+        console.error("Error fetching job data:", error);
+        alert("Failed to load jobs. Please try again later.");
+      });
+
+    // Function to display job cards dynamically
+    function displayJobs(jobs) {
+      const jobCards = document.getElementById('jobCards');
+      jobCards.innerHTML = ''; // Clear existing cards
+
+      // Create a card for each job
+      jobs.forEach(job => {
+        const card = document.createElement('div');
+        card.className = 'job-card';
+        card.innerHTML = `
+          <h2>${job.name}</h2>
+          <p>Job Type: ${job.jobType}</p>
+          <p>Stipend: ${job.stipend}</p>
+          <p>Required Experience: ${job.workExperience} years</p>
+          <p>Job Options: ${job.jobOptions.join(', ')}</p>
+          <button onclick="location.href='details.html?id=${job._id}'">View Details</button>
+        `;
+        jobCards.appendChild(card); // Append each card to the jobCards div
+      });
+    }
+
+    // Search functionality to filter jobs based on user input
+    document.getElementById('searchInput').addEventListener('input', function () {
+      const query = this.value.toLowerCase();
+      const filteredJobs = jobs.filter(job => {
+        return job.name.toLowerCase().includes(query) ||
+          job.jobType.toLowerCase().includes(query) ||
+          job.stipend.toString().includes(query);
+      });
+      displayJobs(filteredJobs); // Display filtered jobs
+    });
+  </script>
+</body>
+
+</html>

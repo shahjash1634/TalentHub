@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="main.css">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+  <title>Dashboard</title>
+</head>
+
+<body>
+  <h1>Dashboard</h1>
+  <h2>Applied Candidates</h2>
+  <div id="appliedCandidates">
+    <!-- List of applied candidates will be populated here -->
+  </div>
+  <script>
+    // Fetch applied candidates with detailed error handling
+    fetch('/appliedCandidates')
+      .then(response => {
+        if (!response.ok) {
+          throw new Error(`HTTP error! Status: ${response.status}`);
+        }
+        return response.json();
+      })
+      .then(data => {
+        console.log("Applied Candidates:", data);
+
+        const candidateList = document.getElementById('appliedCandidates');
+        candidateList.innerHTML = ''; // Clear existing candidates
+        data.forEach(candidate => {
+          const candidateItem = document.createElement('div');
+          candidateItem.className = 'candidate-item';
+          candidateItem.id = `candidate-${candidate._id}`; // Assign unique ID
+          candidateItem.innerHTML = `
+            <p>Name: ${candidate.name}</p>
+            <p>Email: ${candidate.email}</p>
+            <p>Skills: ${candidate.skills ? candidate.skills.join(', ') : 'Not provided'}</p>
+            <button onclick="downloadProfile('${candidate._id}')">Download Profile</button>
+            <button onclick="confirmJob('${candidate._id}')">Confirm Job</button>
+          `;
+          candidateList.appendChild(candidateItem);
+        });
+      })
+      .catch(error => {
+        console.error("Error fetching applied candidates:", error);
+        const candidateList = document.getElementById('appliedCandidates');
+        candidateList.innerHTML = `<p class="error">Failed to load candidates. Please try again later.</p>`;
+      });
+
+    // Function to handle downloading candidate profile as PDF
+    function downloadProfile(candidateId) {
+      const candidateElement = document.getElementById(`candidate-${candidateId}`);
+      if (!candidateElement) {
+        console.error(`Candidate element with ID candidate-${candidateId} not found.`);
+        return;
+      }
+      const options = {
+        margin: 1,
+        filename: `candidate-profile-${candidateId}.pdf`,
+        image: { type: 'jpeg', quality: 0.98 },
+        html2canvas: { scale: 2 },
+        jsPDF: { unit: 'in', format: 'letter', orientation: 'portrait' }
+      };
+
+      html2pdf().set(options).from(candidateElement).save().then(() => {
+        console.log(`PDF for candidate ID ${candidateId} downloaded successfully.`);
+      }).catch(error => {
+        console.error("Error generating PDF:", error);
+      });
+    }
+
+    // Function to confirm job for a candidate
+    function confirmJob(candidateId) {
+      window.location.href = `payment.html?candidateId=${candidateId}`;
+    }
+  </script>
+</body>
+
+</html>

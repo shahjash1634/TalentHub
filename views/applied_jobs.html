@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="main.css">
+  <title>Applied Jobs</title>
+</head>
+
+<body>
+  <h1>Your Applied Jobs</h1>
+  <div id="appliedJobsList">
+    <!-- List of applied jobs will be populated here -->
+  </div>
+  <script>
+    fetch('/appliedJobs')
+      .then(response => response.json())
+      .then(jobs => {
+        const appliedJobsList = document.getElementById('appliedJobsList');
+        jobs.forEach(job => {
+          const jobItem = document.createElement('div');
+          jobItem.className = 'job-item';
+          jobItem.innerHTML = `
+                        <p>Job: ${job.title}</p>
+                        <p>Status: ${job.status}</p>
+                    `;
+          appliedJobsList.appendChild(jobItem);
+        });
+      });
+  </script>
+</body>
+
+</html>

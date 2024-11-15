@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="main.css">
+  <title>Register</title>
+</head>
+
+<body>
+  <h1>Register</h1>
+
+  <div id="jobTakerForm" style="display: none;">
+    <form id="registrationFormTaker">
+      <h2>Job Taker Registration</h2>
+
+      <!-- Page 1 -->
+      <div class="form-page" id="takerPage1">
+        <input type="text" name="name" placeholder="Name" required>
+        <input type="number" name="age" placeholder="Age" required>
+        <input type="email" name="email" placeholder="Email" required>
+        <input type="tel" name="phone" placeholder="Phone" required>
+        <button type="button" onclick="showPage('takerPage2')">Next</button>
+      </div>
+
+      <!-- Page 2 -->
+      <div class="form-page" id="takerPage2" style="display: none;">
+        <input type="text" name="collegeYear" placeholder="College Passout Year" required>
+        <input type="number" name="cgpa" placeholder="CGPA" required>
+        <input type="text" name="degree" placeholder="Degree" required>
+        <button type="button" onclick="showPage('takerPage1')">Previous</button>
+        <button type="button" onclick="showPage('takerPage3')">Next</button>
+      </div>
+
+      <!-- Page 3 -->
+      <div class="form-page" id="takerPage3" style="display: none;">
+        <input type="text" name="experience" placeholder="Experience" required>
+        <input type="text" name="extracurricular" placeholder="Extra Curricular Activities">
+        <textarea name="aboutMe" placeholder="About Me"></textarea>
+        <button type="button" onclick="showPage('takerPage2')">Previous</button>
+        <button type="submit">Submit</button>
+      </div>
+    </form>
+  </div>
+
+  <div id="jobGiverForm" style="display: none;">
+    <form id="registrationFormGiver">
+      <h2>Job Giver Registration</h2>
+
+      <!-- Page 1 -->
+      <div class="form-page" id="giverPage1">
+        <input type="text" name="name" placeholder="Name" required>
+        <input type="email" name="email" placeholder="Email" required>
+        <input type="tel" name="phone" placeholder="Phone" required>
+        <button type="button" onclick="showPage('giverPage2')">Next</button>
+      </div>
+
+      <!-- Page 2 -->
+      <div class="form-page" id="giverPage2" style="display: none;">
+        <input type="text" name="jobType" placeholder="Type of Job" required>
+        <input type="text" name="stipend" placeholder="Stipend" required>
+        <input type="number" name="workExperience" placeholder="Required Experience" required>
+        <button type="button" onclick="showPage('giverPage1')">Previous</button>
+        <button type="button" onclick="showPage('giverPage3')">Next</button>
+      </div>
+
+      <!-- Page 3 -->
+      <div class="form-page" id="giverPage3" style="display: none;">
+        <label style="display: block; margin-bottom: 8px;">
+          <input type="checkbox" name="jobTypeOption" value="Full-Time"> Full-Time
+        </label>
+        <label style="display: block; margin-bottom: 8px;">
+          <input type="checkbox" name="jobTypeOption" value="Part-Time"> Part-Time
+        </label>
+        <label style="display: block; margin-bottom: 16px;">
+          <input type="checkbox" name="jobTypeOption" value="Internship"> Internship
+        </label>
+        <button type="button" onclick="showPage('giverPage2')" style="margin-right: 8px;">Previous</button>
+        <button type="submit">Submit</button>
+      </div>
+
+    </form>
+  </div>
+
+  <script>
+    function showFormBasedOnRole() {
+      const urlParams = new URLSearchParams(window.location.search);
+      const role = urlParams.get('role');
+
+      if (role === 'jobTaker') {
+        document.getElementById('jobTakerForm').style.display = 'block';
+      } else if (role === 'jobGiver') {
+        document.getElementById('jobGiverForm').style.display = 'block';
+      }
+    }
+
+    function showPage(pageId) {
+      const allPages = document.querySelectorAll('.form-page');
+      allPages.forEach(page => page.style.display = 'none'); // Hide all pages
+      document.getElementById(pageId).style.display = 'block'; // Show the selected page
+    }
+
+    document.addEventListener('DOMContentLoaded', showFormBasedOnRole);
+
+    document.getElementById('registrationFormTaker').onsubmit = function (event) {
+      event.preventDefault();
+      window.location.href = 'apply.html';
+    };
+
+    document.getElementById('registrationFormGiver').onsubmit = function (event) {
+      event.preventDefault();
+      window.location.href = 'dashboard.html';
+    };
+  </script>
+</body>
+
+</html>

@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="main.css">
+  <title>Job Details</title>
+</head>
+
+<body>
+  <h1>Job Details</h1>
+  <div id="jobDetails">
+    <!-- Job details will be populated here -->
+  </div>
+  <button id="applyButton">Apply</button>
+  <script>
+    const urlParams = new URLSearchParams(window.location.search);
+    const jobId = urlParams.get('id');
+
+    fetch(`/job/${jobId}`)
+      .then(response => response.json())
+      .then(job => {
+        const jobDetails = document.getElementById('jobDetails');
+        jobDetails.innerHTML = `
+                    <h2>${job.companyName}</h2>
+                    <p>Job Type: ${job.jobType}</p>
+                    <p>Stipend: ${job.stipend}</p>
+                    <p>Description: ${job.description}</p>
+                `;
+      });
+
+    document.getElementById('applyButton').onclick = function () {
+      // Handle job application logic
+      fetch(`/apply/${jobId}`, { method: 'POST' })
+        .then(response => {
+          if (response.ok) {
+            alert('Applied successfully!');
+          }
+        });
+    };
+  </script>
+</body>
+
+</html>
