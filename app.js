@@ -18,7 +18,7 @@ mongoose
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(session({
-  secret: process.env.SESSION_SECRET || 'yourSecretKey', // Use env variable for the session secret
+  secret: process.env.SESSION_SECRET || 'yourSecretKey',
   resave: false,
   saveUninitialized: true,
 }));
@@ -96,6 +96,16 @@ app.post('/confirmPayment', async (req, res) => {
   try {
     const { companyName, companyEmail, confirmationEmail, startingAmount, paymentType, bankName, expiryDate, upiId } = req.body;
 
+    // Validate confirmationEmail
+    if (!confirmationEmail) {
+      return res.status(400).json({ message: 'No recipient email defined' });
+    }
+
+    const isValidEmail = (email) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+    if (!isValidEmail(confirmationEmail)) {
+      return res.status(400).json({ message: 'Invalid email format' });
+    }
+
     // Prepare payment details
     const paymentDetails = `
       <h3>Payment Confirmation</h3>
@@ -105,37 +115,39 @@ app.post('/confirmPayment', async (req, res) => {
       <p><strong>Payment Type:</strong> ${paymentType}</p>
       ${paymentType === 'card'
         ? `<p><strong>Bank Name:</strong> ${bankName}</p>
-             <p><strong>Expiry Date:</strong> ${expiryDate}</p>` // Card payment details
+           <p><strong>Expiry Date:</strong> ${expiryDate}</p>` // Card payment details
         : paymentType === 'upi'
           ? `<p><strong>UPI ID:</strong> ${upiId}</p>` // UPI payment details
           : ''
       }
     `;
 
-    // Set up Nodemailer transporter using environment variables
+    // Set up Nodemailer transporter
     const transporter = nodemailer.createTransport({
       service: 'Gmail',
       auth: {
-        user: process.env.EMAIL_USER, // Use env variable for email
-        pass: process.env.EMAIL_PASS, // Use env variable for email password
+        user: process.env.EMAIL_USER, // Use the company email entered in the form as the sender
+        pass: process.env.EMAIL_PASS, // Use an environment variable for email password
       },
     });
 
     // Mail options
     const mailOptions = {
-      from: companyEmail, // Sender email
-      to: 'jrshah_b22@it.ac.in', // Recipient email (make sure it's in quotes)
+      from: companyEmail, // Sender email (from the form input)
+      to: confirmationEmail, // Recipient email (from the form input)
       subject: 'Payment Confirmation',
       html: paymentDetails,
     };
 
+    console.log("Mail Options:", mailOptions); // Debugging log
+
     // Send email
     await transporter.sendMail(mailOptions);
 
-    res.status(200).send('Payment confirmed and email sent!');
+    res.status(200).json({ message: 'Payment confirmed and email sent!' });
   } catch (error) {
     console.error('Error confirming payment:', error);
-    res.status(500).send('Internal Server Error');
+    res.status(500).json({ message: 'Internal Server Error' });
   }
 });
 // Applied Candidates Route

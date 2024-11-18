@@ -71,15 +71,27 @@
     });
 
     // Form submission handler
+    // Form submission handler
     document.getElementById('paymentForm').onsubmit = async function (event) {
       event.preventDefault();
 
       const formData = new FormData(this);
+      const data = {};
+
+      // Convert FormData to JSON
+      formData.forEach((value, key) => {
+        data[key] = value;
+      });
+
+      console.log("Data being sent:", data); // Log the data being sent
 
       try {
         const response = await fetch('/confirmPayment', {
           method: 'POST',
-          body: formData,
+          headers: {
+            'Content-Type': 'application/json', // Set the content type to JSON
+          },
+          body: JSON.stringify(data), // Convert the data to JSON
         });
 
         const result = await response.json();
