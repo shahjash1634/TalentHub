@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="main.css">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+  <title>Apply</title>
+  <style>
+    .job-details {
+      display: none;
+      margin-top: 10px;
+      border: 1px solid #ccc;
+      padding: 10px;
+      background-color: #f9f9f9;
+    }
+
+    .job-name {
+      cursor: pointer;
+      font-weight: bold;
+      margin-bottom: 5px;
+      color: blue;
+    }
+
+    .job-name:hover {
+      text-decoration: underline;
+    }
+
+    .no-print {
+      display: inline-block;
+    }
+  </style>
+</head>
+
+<body>
+  <h1>Available Jobs</h1>
+  <div id="availableJobs">
+    <!-- List of jobs will be populated here -->
+  </div>
+
+  <script>
+    fetch('/jobs')
+      .then(response => {
+        if (!response.ok) {
+          throw new Error(`HTTP error! Status: ${response.status}`);
+        }
+        return response.json();
+      })
+      .then(data => {
+        const jobList = document.getElementById('availableJobs');
+        jobList.innerHTML = '';
+
+        data.forEach(job => {
+          const jobContainer = document.createElement('div');
+          jobContainer.className = 'job-container';
+
+          const jobName = document.createElement('p');
+          jobName.className = 'job-name';
+          jobName.textContent = job.name;
+          jobName.onclick = () => toggleDetails(job._id);
+          jobContainer.appendChild(jobName);
+
+          const jobDetails = document.createElement('div');
+          jobDetails.className = 'job-details';
+          jobDetails.id = `job-${job._id}`;
+          jobDetails.innerHTML = `
+            <p><strong>Job Name:</strong> ${job.name}</p>
+            <p><strong>Email:</strong> ${job.email}</p>
+            <p><strong>Job Type:</strong> ${job.jobType}</p>
+            <p><strong>Stipend:</strong> ${job.stipend}</p>
+            <p><strong>Experience:</strong> ${job.workExperience || 'Not provided'}</p>
+            <p><strong>Job Options:</strong> ${job.jobOptions ? job.jobOptions.join(', ') : 'Not provided'}</p>
+            <button class="no-print" onclick="downloadJob('${job._id}')">Download Job</button>
+            <button class="no-print" onclick="applyJob('${job._id}')">Apply for Job</button>
+          `;
+          jobContainer.appendChild(jobDetails);
+
+          jobList.appendChild(jobContainer);
+        });
+      })
+      .catch(error => {
+        console.error("Error fetching jobs:", error);
+        const jobList = document.getElementById('availableJobs');
+        jobList.innerHTML = `<p class="error">Failed to load jobs. Please try again later.</p>`;
+      });
+
+    function toggleDetails(jobId) {
+      const detailsElement = document.getElementById(`job-${jobId}`);
+      if (detailsElement) {
+        const isVisible = detailsElement.style.display === 'block';
+        detailsElement.style.display = isVisible ? 'none' : 'block';
+      }
+    }
+
+    function downloadJob(jobId) {
+      const jobElement = document.getElementById(`job-${jobId}`);
+      if (!jobElement) {
+        console.error(`Job element with ID job-${jobId} not found.`);
+        return;
+      }
+
+      const clone = jobElement.cloneNode(true);
+      clone.querySelectorAll('.no-print').forEach(element => element.remove());
+
+      const options = {
+        margin: 1,
+        filename: `job-${jobId}.pdf`,
+        image: { type: 'jpeg', quality: 0.98 },
+        html2canvas: { scale: 2 },
+        jsPDF: { unit: 'in', format: 'letter', orientation: 'portrait' }
+      };
+
+      html2pdf().set(options).from(clone).save();
+    }
+
+    function applyJob(jobId) {
+      window.location.href = `apply.html?jobId=${jobId}`;
+    }
+  </script>
+</body>
+
+</html>

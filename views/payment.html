@@ -6,6 +6,11 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <link rel="stylesheet" href="main.css">
   <title>Payment</title>
+  <style>
+    .hidden {
+      display: none;
+    }
+  </style>
 </head>
 
 <body>
@@ -15,20 +20,78 @@
     <input type="email" name="companyEmail" placeholder="Company Email" required>
     <input type="email" name="confirmationEmail" placeholder="Email to Send Confirmation" required>
     <input type="number" name="startingAmount" placeholder="Starting Amount" required>
+
+    <!-- Payment Type Dropdown -->
+    <select name="paymentType" id="paymentType" required>
+      <option value="">Select Payment Type</option>
+      <option value="card">Card</option>
+      <option value="upi">UPI</option>
+    </select>
+
+    <!-- Card Details -->
+    <div id="cardDetails" class="hidden">
+      <input type="text" name="bankName" placeholder="Bank Name">
+      <input type="text" name="expiryDate" placeholder="Expiry Date (MM/YY)">
+    </div>
+
+    <!-- UPI Details -->
+    <div id="upiDetails" class="hidden">
+      <input type="text" name="upiId" placeholder="UPI ID">
+    </div>
+
     <button type="submit">Confirm Payment</button>
   </form>
+
   <script>
-    document.getElementById('paymentForm').onsubmit = function (event) {
-      event.preventDefault();
-      const formData = new FormData(this);
-      fetch('/confirmPayment', {
-        method: 'POST',
-        body: formData
-      }).then(response => {
-        if (response.ok) {
-          alert('Payment confirmed and email sent!');
-        }
+    const paymentType = document.getElementById('paymentType');
+    const cardDetails = document.getElementById('cardDetails');
+    const upiDetails = document.getElementById('upiDetails');
+
+    paymentType.addEventListener('change', function () {
+      const type = this.value;
+
+      // Hide all conditional fields
+      cardDetails.classList.add('hidden');
+      upiDetails.classList.add('hidden');
+
+      // Remove "required" from hidden fields
+      document.querySelectorAll('#cardDetails input, #upiDetails input').forEach(input => {
+        input.removeAttribute('required');
       });
+
+      // Show relevant fields and set "required"
+      if (type === 'card') {
+        cardDetails.classList.remove('hidden');
+        document.querySelector('#cardDetails input[name="bankName"]').setAttribute('required', 'true');
+        document.querySelector('#cardDetails input[name="expiryDate"]').setAttribute('required', 'true');
+      } else if (type === 'upi') {
+        upiDetails.classList.remove('hidden');
+        document.querySelector('#upiDetails input[name="upiId"]').setAttribute('required', 'true');
+      }
+    });
+
+    // Form submission handler
+    document.getElementById('paymentForm').onsubmit = async function (event) {
+      event.preventDefault();
+
+      const formData = new FormData(this);
+
+      try {
+        const response = await fetch('/confirmPayment', {
+          method: 'POST',
+          body: formData,
+        });
+
+        const result = await response.json();
+        if (response.ok) {
+          alert(result.message); // Payment confirmed
+        } else {
+          alert(result.message); // Transaction failed
+        }
+      } catch (error) {
+        console.error('Error during submission:', error);
+        alert('An error occurred while processing your request. Please try again.');
+      }
     };
   </script>
 </body>
