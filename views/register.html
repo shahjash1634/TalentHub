@@ -6,17 +6,33 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <link rel="stylesheet" href="main.css">
   <title>Register</title>
+  <style>
+    header img {
+      cursor: pointer;
+      transition: transform 0.3s ease;
+    }
+
+    header img:hover {
+      transform: scale(1.1);
+    }
+  </style>
 </head>
 
 <body>
-  <h1>Register</h1>
+  <header>
+    <a href="about.html">
+      <img src="images/logo_header.jpeg" alt="TalentHub Logo">
+    </a>
+    <h1>Register</h1>
+  </header>
+
 
   <div id="jobTakerForm" style="display: none;">
     <form id="registrationFormTaker">
       <h2>Job Taker Registration</h2>
+      <input type="hidden" name="role" value="jobTaker">
 
-      <!-- Page 1 -->
-      <div class="form-page" id="takerPage1">
+      <div class="form-page active" id="takerPage1">
         <input type="text" name="name" placeholder="Name" required>
         <input type="number" name="age" placeholder="Age" required>
         <input type="email" name="email" placeholder="Email" required>
@@ -24,8 +40,7 @@
         <button type="button" onclick="showPage('takerPage2')">Next</button>
       </div>
 
-      <!-- Page 2 -->
-      <div class="form-page" id="takerPage2" style="display: none;">
+      <div class="form-page" id="takerPage2">
         <input type="text" name="collegeYear" placeholder="College Passout Year" required>
         <input type="number" name="cgpa" placeholder="CGPA" required>
         <input type="text" name="degree" placeholder="Degree" required>
@@ -33,8 +48,7 @@
         <button type="button" onclick="showPage('takerPage3')">Next</button>
       </div>
 
-      <!-- Page 3 -->
-      <div class="form-page" id="takerPage3" style="display: none;">
+      <div class="form-page" id="takerPage3">
         <input type="text" name="experience" placeholder="Experience" required>
         <input type="text" name="extracurricular" placeholder="Extra Curricular Activities">
         <textarea name="aboutMe" placeholder="About Me"></textarea>
@@ -47,17 +61,16 @@
   <div id="jobGiverForm" style="display: none;">
     <form id="registrationFormGiver">
       <h2>Job Giver Registration</h2>
+      <input type="hidden" name="role" value="jobGiver">
 
-      <!-- Page 1 -->
-      <div class="form-page" id="giverPage1">
+      <div class="form-page active" id="giverPage1">
         <input type="text" name="name" placeholder="Name" required>
         <input type="email" name="email" placeholder="Email" required>
         <input type="tel" name="phone" placeholder="Phone" required>
         <button type="button" onclick="showPage('giverPage2')">Next</button>
       </div>
 
-      <!-- Page 2 -->
-      <div class="form-page" id="giverPage2" style="display: none;">
+      <div class="form-page" id="giverPage2">
         <input type="text" name="jobType" placeholder="Type of Job" required>
         <input type="text" name="stipend" placeholder="Stipend" required>
         <input type="number" name="workExperience" placeholder="Required Experience" required>
@@ -65,21 +78,19 @@
         <button type="button" onclick="showPage('giverPage3')">Next</button>
       </div>
 
-      <!-- Page 3 -->
-      <div class="form-page" id="giverPage3" style="display: none;">
-        <label style="display: block; margin-bottom: 8px;">
-          <input type="checkbox" name="jobTypeOption" value="Full-Time"> Full-Time
+      <div class="form-page" id="giverPage3">
+        <label>
+          <input type="checkbox" name="jobOptions" value="Full-Time"> Full-Time
         </label>
-        <label style="display: block; margin-bottom: 8px;">
-          <input type="checkbox" name="jobTypeOption" value="Part-Time"> Part-Time
+        <label>
+          <input type="checkbox" name="jobOptions" value="Part-Time"> Part-Time
         </label>
-        <label style="display: block; margin-bottom: 16px;">
-          <input type="checkbox" name="jobTypeOption" value="Internship"> Internship
+        <label>
+          <input type="checkbox" name="jobOptions" value="Internship"> Internship
         </label>
-        <button type="button" onclick="showPage('giverPage2')" style="margin-right: 8px;">Previous</button>
+        <button type="button" onclick="showPage('giverPage2')">Previous</button>
         <button type="submit">Submit</button>
       </div>
-
     </form>
   </div>
 
@@ -87,7 +98,6 @@
     function showFormBasedOnRole() {
       const urlParams = new URLSearchParams(window.location.search);
       const role = urlParams.get('role');
-
       if (role === 'jobTaker') {
         document.getElementById('jobTakerForm').style.display = 'block';
       } else if (role === 'jobGiver') {
@@ -96,22 +106,43 @@
     }
 
     function showPage(pageId) {
-      const allPages = document.querySelectorAll('.form-page');
-      allPages.forEach(page => page.style.display = 'none'); // Hide all pages
-      document.getElementById(pageId).style.display = 'block'; // Show the selected page
+      document.querySelectorAll('.form-page').forEach(page => page.classList.remove('active'));
+      document.getElementById(pageId).classList.add('active');
     }
 
-    document.addEventListener('DOMContentLoaded', showFormBasedOnRole);
+    async function handleSubmit(formId, role) {
+      const form = document.getElementById(formId);
+      form.onsubmit = async function (event) {
+        event.preventDefault();
 
-    document.getElementById('registrationFormTaker').onsubmit = function (event) {
-      event.preventDefault();
-      window.location.href = 'apply.html';
-    };
+        const formData = new FormData(this);
+        const data = Object.fromEntries(formData);
+        data.role = role;
 
-    document.getElementById('registrationFormGiver').onsubmit = function (event) {
-      event.preventDefault();
-      window.location.href = 'dashboard.html';
-    };
+        try {
+          const response = await fetch('/register', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(data),
+          });
+
+          if (response.ok) {
+            window.location.href = role === "jobTaker" ? 'apply.html' : 'dashboard.html';
+          } else {
+            const errorText = await response.text();
+            alert(`Error: ${errorText}`);
+          }
+        } catch (error) {
+          alert(`Network error: ${error.message}`);
+        }
+      };
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+      showFormBasedOnRole();
+      handleSubmit('registrationFormTaker', 'jobTaker');
+      handleSubmit('registrationFormGiver', 'jobGiver');
+    });
   </script>
 </body>
 

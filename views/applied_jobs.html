@@ -4,31 +4,55 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <link rel="stylesheet" href="main.css">
   <title>Applied Jobs</title>
+  <style>
+    .confirmed {
+      background-color: green;
+      color: white;
+    }
+  </style>
 </head>
 
 <body>
   <h1>Your Applied Jobs</h1>
-  <div id="appliedJobsList">
-    <!-- List of applied jobs will be populated here -->
-  </div>
+  <div id="appliedJobsList"></div>
+
   <script>
-    fetch('/appliedJobs')
-      .then(response => response.json())
+    fetch('/appliedJobs', {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    })
+      .then(response => {
+        if (!response.ok) {
+          throw new Error('Failed to fetch applied jobs');
+        }
+        return response.json();
+      })
       .then(jobs => {
         const appliedJobsList = document.getElementById('appliedJobsList');
-        jobs.forEach(job => {
-          const jobItem = document.createElement('div');
-          jobItem.className = 'job-item';
-          jobItem.innerHTML = `
-                        <p>Job: ${job.title}</p>
-                        <p>Status: ${job.status}</p>
-                    `;
-          appliedJobsList.appendChild(jobItem);
-        });
+
+        if (jobs.length === 0) {
+          appliedJobsList.innerHTML = '<p>You have not applied for any jobs yet.</p>';
+        } else {
+          jobs.forEach(job => {
+            const jobItem = document.createElement('div');
+            jobItem.className = 'job-item';
+            jobItem.innerHTML = `
+              <h3>${job.title}</h3>
+              <p style="background: ${job.status === 'confirmed' ? 'green' : 'yellow'
+              }; padding: 5px;">Status: ${job.status}</p>
+            `;
+            appliedJobsList.appendChild(jobItem);
+          });
+        }
+      })
+      .catch(error => {
+        console.error('Error fetching applied jobs:', error);
       });
   </script>
+
 </body>
 
 </html>

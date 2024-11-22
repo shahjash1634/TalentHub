@@ -4,46 +4,201 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <link rel="stylesheet" href="main.css">
   <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
   <title>Dashboard</title>
   <style>
-    .candidate-details {
-      display: none;
-      /* Initially hide details */
-      margin-top: 10px;
-      border: 1px solid #ccc;
-      padding: 10px;
-      background-color: #f9f9f9;
+    /* Global Styles */
+    body {
+      font-family: 'Arial', sans-serif;
+      margin: 0;
+      padding: 0;
+      background: linear-gradient(135deg, #6a11cb, #2575fc);
+      color: #fff;
+      text-align: center;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: flex-start;
+      min-height: 100vh;
     }
 
+    /* Header Styles */
+    header {
+      text-align: center;
+      margin-bottom: 20px;
+    }
+
+    header img {
+      max-width: 300px;
+      height: auto;
+      margin-bottom: 25px;
+      border-radius: 60%;
+      border: 3px solid white;
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+    }
+
+    header h1 {
+      font-size: 2.5rem;
+      margin: 0;
+    }
+
+    header h2 {
+      font-size: 1.8rem;
+      margin-top: 10px;
+      color: #ffd700;
+    }
+
+    /* Main Content */
+    #appliedCandidates {
+      width: 100%;
+      max-width: 800px;
+      padding: 20px;
+    }
+
+    /* Candidate Container */
+    .candidate-container {
+      background: rgba(255, 255, 255, 0.2);
+      padding: 15px;
+      border-radius: 10px;
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+      text-align: left;
+      margin-bottom: 15px;
+    }
+
+    /* Candidate Name */
     .candidate-name {
+      font-size: 1.4rem;
+      margin: 0;
       cursor: pointer;
-      font-weight: bold;
-      margin-bottom: 5px;
-      color: blue;
+      transition: color 0.3s ease;
     }
 
     .candidate-name:hover {
-      text-decoration: underline;
+      color: #ffd700;
     }
 
-    .no-print {
-      display: inline-block;
-      /* Visible on the page but excluded from the PDF */
+    .candidate-details {
+      display: none;
+      margin-top: 10px;
+      font-size: 1rem;
+    }
+
+    .candidate-details p {
+      margin: 5px 0;
+    }
+
+    /* Download and Confirm Job Buttons */
+    button {
+      background: #ffd700;
+      color: #333;
+      padding: 10px 20px;
+      border: none;
+      border-radius: 5px;
+      font-size: 1rem;
+      cursor: pointer;
+      transition: all 0.3s ease-in-out;
+      margin-top: 10px;
+      margin-right: 10px;
+    }
+
+    button:hover {
+      background: #ffa500;
+      transform: scale(1.05);
+    }
+
+    /* Error Message */
+    .error {
+      color: #ff6b6b;
+      font-weight: bold;
+      margin: 20px 0;
+    }
+
+    /* PDF Styles */
+    .pdf-container {
+      background: white;
+      color: #333;
+      padding: 20px;
+      max-width: 800px;
+      margin: 0 auto;
+    }
+
+    .pdf-header {
+      text-align: center;
+      margin-bottom: 30px;
+      padding: 20px;
+    }
+
+    .pdf-header img {
+      max-width: 200px;
+      margin-bottom: 20px;
+      border-radius: 0;
+      border: none;
+    }
+
+    .pdf-header h1 {
+      color: #333;
+      margin: 10px 0;
+      font-size: 24px;
+    }
+
+    .pdf-content {
+      margin-top: 20px;
+      padding: 0 20px;
+    }
+
+    .pdf-content p {
+      margin: 10px 0;
+      line-height: 1.6;
+      font-size: 14px;
+      color: #333;
+    }
+
+    .pdf-content strong {
+      color: #555;
+    }
+
+    /* Responsive Design */
+    @media (max-width: 600px) {
+      header h1 {
+        font-size: 2rem;
+      }
+
+      .candidate-name {
+        font-size: 1.2rem;
+      }
+
+      button {
+        padding: 8px 15px;
+        font-size: 0.9rem;
+      }
+    }
+
+    header img {
+      cursor: pointer;
+      transition: transform 0.3s ease;
+    }
+
+    header img:hover {
+      transform: scale(1.1);
     }
   </style>
 </head>
 
 <body>
-  <h1>Dashboard</h1>
-  <h2>Applied Candidates</h2>
+  <header>
+    <a href="about.html">
+      <img src="images/logo_header.jpeg" alt="TalentHub Logo" />
+    </a>
+    <h1>Job Dashboard</h1>
+    <h2>Applied Candidates</h2>
+  </header>
+
   <div id="appliedCandidates">
-    <!-- List of applied candidates will be populated here -->
+    <!-- List of applied candidates will be dynamically populated here -->
   </div>
 
   <script>
-    // Fetch applied candidates with detailed error handling
+    // Fetch applied candidates from the server
     fetch('/appliedCandidates')
       .then(response => {
         if (!response.ok) {
@@ -52,91 +207,118 @@
         return response.json();
       })
       .then(data => {
-        console.log("Applied Candidates:", data);
-
         const candidateList = document.getElementById('appliedCandidates');
-        candidateList.innerHTML = ''; // Clear existing candidates
+        candidateList.innerHTML = '';
 
-        data.forEach(candidate => {
-          // Create the container for the candidate
-          const candidateContainer = document.createElement('div');
-          candidateContainer.className = 'candidate-container';
+        if (data.length === 0) {
+          candidateList.innerHTML = '<p>No candidates have applied yet.</p>';
+        } else {
+          data.forEach(candidate => {
+            const candidateContainer = document.createElement('div');
+            candidateContainer.className = 'candidate-container';
 
-          // Add the clickable name
-          const candidateName = document.createElement('p');
-          candidateName.className = 'candidate-name';
-          candidateName.textContent = candidate.name;
-          candidateName.onclick = () => toggleDetails(candidate._id);
-          candidateContainer.appendChild(candidateName);
+            const candidateName = document.createElement('p');
+            candidateName.className = 'candidate-name';
+            candidateName.textContent = candidate.name;
+            candidateName.onclick = () => toggleDetails(candidate._id);
+            candidateContainer.appendChild(candidateName);
 
-          // Add the hidden details section
-          const candidateDetails = document.createElement('div');
-          candidateDetails.className = 'candidate-details';
-          candidateDetails.id = `candidate-${candidate._id}`;
-          candidateDetails.innerHTML = `
-            <p><strong>Name:</strong> ${candidate.name}</p>
-            <p><strong>Email:</strong> ${candidate.email}</p>
-            <p><strong>Age:</strong> ${candidate.age || 'Not provided'}</p>
-            <p><strong>Phone:</strong> ${candidate.phone || 'Not provided'}</p>
-            <p><strong>College Year:</strong> ${candidate.collegeYear || 'Not provided'}</p>
-            <p><strong>CGPA:</strong> ${candidate.cgpa || 'Not provided'}</p>
-            <p><strong>Degree:</strong> ${candidate.degree || 'Not provided'}</p>
-            <p><strong>Experience:</strong> ${candidate.experience || 'Not provided'}</p>
-            <p><strong>Extracurricular Activities:</strong> ${candidate.extracurricular || 'Not provided'}</p>
-            <p><strong>About:</strong> ${candidate.about || 'Not provided'}</p>
-            <p><strong>Role:</strong> ${candidate.role || 'Not provided'}</p>
-            <button class="no-print" onclick="downloadProfile('${candidate._id}')">Download Profile</button>
-            <button class="no-print" onclick="confirmJob('${candidate._id}')">Confirm Job</button>
-          `;
-          candidateContainer.appendChild(candidateDetails);
-
-          // Append the entire container to the list
-          candidateList.appendChild(candidateContainer);
-        });
+            const candidateDetails = document.createElement('div');
+            candidateDetails.className = 'candidate-details';
+            candidateDetails.id = `candidate-${candidate._id}`;
+            candidateDetails.innerHTML = `
+                            <p><strong>Name:</strong> ${candidate.name}</p>
+                            <p><strong>Email:</strong> ${candidate.email}</p>
+                            <p><strong>Age:</strong> ${candidate.age || 'Not provided'}</p>
+                            <p><strong>Phone:</strong> ${candidate.phone || 'Not provided'}</p>
+                            <p><strong>College Year:</strong> ${candidate.collegeYear || 'Not provided'}</p>
+                            <p><strong>CGPA:</strong> ${candidate.cgpa || 'Not provided'}</p>
+                            <p><strong>Degree:</strong> ${candidate.degree || 'Not provided'}</p>
+                            <p><strong>Experience:</strong> ${candidate.experience || 'Not provided'}</p>
+                            <p><strong>Extracurricular Activities:</strong> ${candidate.extracurricular || 'Not provided'}</p>
+                            <p><strong>About:</strong> ${candidate.about || 'Not provided'}</p>
+                            <p><strong>Role:</strong> ${candidate.role || 'Not provided'}</p>
+                            <button class="no-print" onclick="downloadProfile('${candidate._id}')">Download Profile</button>
+                            <button class="no-print" onclick="confirmJob('${candidate._id}')">Confirm Job</button>
+                        `;
+            candidateContainer.appendChild(candidateDetails);
+            candidateList.appendChild(candidateContainer);
+          });
+        }
       })
       .catch(error => {
         console.error("Error fetching applied candidates:", error);
-        const candidateList = document.getElementById('appliedCandidates');
-        candidateList.innerHTML = `<p class="error">Failed to load candidates. Please try again later.</p>`;
+        document.getElementById('appliedCandidates').innerHTML =
+          `<p class="error">Failed to load candidates. Please try again later.</p>`;
       });
 
-    // Toggle visibility of candidate details
     function toggleDetails(candidateId) {
-      const detailsElement = document.getElementById(`candidate-${candidateId}`);
-      if (detailsElement) {
-        const isVisible = detailsElement.style.display === 'block';
-        detailsElement.style.display = isVisible ? 'none' : 'block';
+      const details = document.getElementById(`candidate-${candidateId}`);
+      if (details) {
+        details.style.display = details.style.display === 'block' ? 'none' : 'block';
       }
     }
 
-    // Function to handle downloading candidate profile as PDF
     function downloadProfile(candidateId) {
       const candidateElement = document.getElementById(`candidate-${candidateId}`);
       if (!candidateElement) {
-        console.error(`Candidate element with ID candidate-${candidateId} not found.`);
+        console.error(`Candidate element not found for ID: ${candidateId}`);
         return;
       }
 
-      // Clone the candidate details, exclude no-print elements, and generate PDF
-      const clone = candidateElement.cloneNode(true);
-      clone.querySelectorAll('.no-print').forEach(element => element.remove());
+      const pdfContainer = document.createElement('div');
+      pdfContainer.className = 'pdf-container';
+
+      const headerDiv = document.createElement('div');
+      headerDiv.className = 'pdf-header';
+
+      const logo = document.createElement('img');
+      logo.src = 'images/logo_header.jpeg';
+      logo.alt = 'TalentHub Logo';
+      headerDiv.appendChild(logo);
+
+      const title = document.createElement('h1');
+      title.textContent = 'Candidate Profile';
+      headerDiv.appendChild(title);
+
+      pdfContainer.appendChild(headerDiv);
+
+      const contentDiv = document.createElement('div');
+      contentDiv.className = 'pdf-content';
+
+      const detailsClone = candidateElement.cloneNode(true);
+      detailsClone.querySelectorAll('.no-print').forEach(el => el.remove());
+
+      contentDiv.appendChild(detailsClone);
+      pdfContainer.appendChild(contentDiv);
 
       const options = {
-        margin: 1,
+        margin: [0.5, 0.5, 0.5, 0.5],
         filename: `candidate-profile-${candidateId}.pdf`,
         image: { type: 'jpeg', quality: 0.98 },
-        html2canvas: { scale: 2 },
-        jsPDF: { unit: 'in', format: 'letter', orientation: 'portrait' }
+        html2canvas: {
+          scale: 2,
+          logging: true,
+          useCORS: true
+        },
+        jsPDF: {
+          unit: 'in',
+          format: 'letter',
+          orientation: 'portrait'
+        }
       };
 
-      html2pdf().set(options).from(clone).save().then(() => {
-        console.log(`PDF for candidate ID ${candidateId} downloaded successfully.`);
-      }).catch(error => {
-        console.error("Error generating PDF:", error);
-      });
+      html2pdf().set(options)
+        .from(pdfContainer)
+        .save()
+        .then(() => {
+          console.log('PDF generated successfully');
+        })
+        .catch(error => {
+          console.error('Error generating PDF:', error);
+        });
     }
 
-    // Function to confirm job for a candidate
     function confirmJob(candidateId) {
       window.location.href = `payment.html?candidateId=${candidateId}`;
     }

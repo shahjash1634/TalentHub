@@ -4,37 +4,200 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <link rel="stylesheet" href="main.css">
   <title>Payment</title>
   <style>
+    /* Global Styles */
+    body {
+      font-family: 'Arial', sans-serif;
+      margin: 0;
+      padding: 0;
+      background: linear-gradient(135deg, #6a11cb, #2575fc);
+      color: #fff;
+      text-align: center;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: flex-start;
+      min-height: 100vh;
+      padding: 20px;
+    }
+
+    /* Header Styles */
+    header {
+      text-align: center;
+      margin-bottom: 40px;
+      width: 100%;
+    }
+
+    header img {
+      max-width: 300px;
+      height: auto;
+      margin-bottom: 25px;
+      border-radius: 60%;
+      border: 3px solid white;
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+    }
+
+    h1 {
+      font-size: 2.5rem;
+      margin: 20px 0;
+      color: #fff;
+    }
+
+    /* Form Styles */
+    #paymentForm {
+      background: rgba(255, 255, 255, 0.2);
+      padding: 30px;
+      border-radius: 15px;
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+      width: 100%;
+      max-width: 500px;
+      margin: 0 auto;
+    }
+
+    input,
+    select {
+      width: 100%;
+      padding: 12px;
+      margin: 10px 0;
+      border: 2px solid rgba(255, 255, 255, 0.3);
+      border-radius: 8px;
+      background: rgba(255, 255, 255, 0.1);
+      color: #fff;
+      font-size: 1rem;
+      box-sizing: border-box;
+      transition: all 0.3s ease;
+    }
+
+    input::placeholder {
+      color: rgba(255, 255, 255, 0.7);
+    }
+
+    input:focus,
+    select:focus {
+      outline: none;
+      border-color: #ffd700;
+      background: rgba(255, 255, 255, 0.2);
+    }
+
+    select {
+      cursor: pointer;
+      appearance: none;
+      -webkit-appearance: none;
+      -moz-appearance: none;
+      background-image: url("data:image/svg+xml,%3Csvg fill='white' height='24' viewBox='0 0 24 24' width='24' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M7 10l5 5 5-5z'/%3E%3Cpath d='M0 0h24v24H0z' fill='none'/%3E%3C/svg%3E");
+      background-repeat: no-repeat;
+      background-position: right 10px center;
+    }
+
+    select option {
+      background: #6a11cb;
+      color: #fff;
+    }
+
+    button {
+      background: #ffd700;
+      color: #333;
+      padding: 12px 30px;
+      border: none;
+      border-radius: 8px;
+      font-size: 1.1rem;
+      cursor: pointer;
+      transition: all 0.3s ease-in-out;
+      margin-top: 20px;
+      width: 100%;
+      font-weight: bold;
+    }
+
+    button:hover {
+      background: #ffa500;
+      transform: scale(1.05);
+    }
+
+    /* Conditional Fields */
     .hidden {
       display: none;
+    }
+
+    #cardDetails,
+    #upiDetails {
+      margin-top: 15px;
+    }
+
+    /* Animation for showing/hiding fields */
+    #cardDetails.hidden,
+    #upiDetails.hidden {
+      opacity: 0;
+      transform: translateY(-20px);
+      transition: opacity 0.3s ease, transform 0.3s ease;
+    }
+
+    #cardDetails:not(.hidden),
+    #upiDetails:not(.hidden) {
+      opacity: 1;
+      transform: translateY(0);
+      transition: opacity 0.3s ease, transform 0.3s ease;
+    }
+
+    /* Responsive Design */
+    @media (max-width: 600px) {
+      header img {
+        max-width: 200px;
+      }
+
+      h1 {
+        font-size: 2rem;
+      }
+
+      #paymentForm {
+        padding: 20px;
+      }
+
+      input,
+      select,
+      button {
+        padding: 10px;
+        font-size: 0.9rem;
+      }
+
+    }
+
+    header img {
+      cursor: pointer;
+      transition: transform 0.3s ease;
+    }
+
+    header img:hover {
+      transform: scale(1.1);
     }
   </style>
 </head>
 
 <body>
-  <h1>Payment Confirmation</h1>
+  <header>
+    <a href="about.html">
+      <img src="images/logo_header.jpeg" alt="TalentHub Logo" />
+    </a>
+    <h1>Selection Confirmation</h1>
+  </header>
+
   <form id="paymentForm">
     <input type="text" name="companyName" placeholder="Company Name" required>
     <input type="email" name="companyEmail" placeholder="Company Email" required>
     <input type="email" name="confirmationEmail" placeholder="Email to Send Confirmation" required>
     <input type="number" name="startingAmount" placeholder="Starting Amount" required>
 
-    <!-- Payment Type Dropdown -->
     <select name="paymentType" id="paymentType" required>
       <option value="">Select Payment Type</option>
       <option value="card">Card</option>
       <option value="upi">UPI</option>
     </select>
 
-    <!-- Card Details -->
     <div id="cardDetails" class="hidden">
       <input type="text" name="bankName" placeholder="Bank Name">
       <input type="text" name="expiryDate" placeholder="Expiry Date (MM/YY)">
     </div>
 
-    <!-- UPI Details -->
     <div id="upiDetails" class="hidden">
       <input type="text" name="upiId" placeholder="UPI ID">
     </div>
@@ -50,16 +213,13 @@
     paymentType.addEventListener('change', function () {
       const type = this.value;
 
-      // Hide all conditional fields
       cardDetails.classList.add('hidden');
       upiDetails.classList.add('hidden');
 
-      // Remove "required" from hidden fields
       document.querySelectorAll('#cardDetails input, #upiDetails input').forEach(input => {
         input.removeAttribute('required');
       });
 
-      // Show relevant fields and set "required"
       if (type === 'card') {
         cardDetails.classList.remove('hidden');
         document.querySelector('#cardDetails input[name="bankName"]').setAttribute('required', 'true');
@@ -70,35 +230,32 @@
       }
     });
 
-    // Form submission handler
-    // Form submission handler
     document.getElementById('paymentForm').onsubmit = async function (event) {
       event.preventDefault();
 
       const formData = new FormData(this);
       const data = {};
 
-      // Convert FormData to JSON
       formData.forEach((value, key) => {
         data[key] = value;
       });
 
-      console.log("Data being sent:", data); // Log the data being sent
+      console.log("Data being sent:", data);
 
       try {
         const response = await fetch('/confirmPayment', {
           method: 'POST',
           headers: {
-            'Content-Type': 'application/json', // Set the content type to JSON
+            'Content-Type': 'application/json',
           },
-          body: JSON.stringify(data), // Convert the data to JSON
+          body: JSON.stringify(data),
         });
 
         const result = await response.json();
         if (response.ok) {
-          alert(result.message); // Payment confirmed
+          alert(result.message);
         } else {
-          alert(result.message); // Transaction failed
+          alert(result.message);
         }
       } catch (error) {
         console.error('Error during submission:', error);

@@ -4,16 +4,248 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>TalentHub - About Us</title>
-  <link rel="stylesheet" href="assets/css/main.css">
+  <title>About TalentHub</title>
+  <style>
+    /* Global Styles */
+    body {
+      font-family: 'Arial', sans-serif;
+      margin: 0;
+      padding: 0;
+      background: linear-gradient(135deg, #6a11cb, #2575fc);
+      color: #fff;
+      text-align: center;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: flex-start;
+      min-height: 100vh;
+    }
+
+    /* Header Styles */
+    header {
+      text-align: center;
+      margin-bottom: 20px;
+    }
+
+    header img {
+      max-width: 300px;
+      height: auto;
+      margin-bottom: 25px;
+      border-radius: 60%;
+      border: 3px solid white;
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+    }
+
+    header h1 {
+      font-size: 2.5rem;
+      margin: 0;
+    }
+
+    /* Main Content */
+    main {
+      width: 100%;
+      max-width: 800px;
+      padding: 20px;
+      position: relative;
+    }
+
+    .section {
+      margin: 20px 0;
+      padding: 20px;
+      background: rgba(255, 255, 255, 0.2);
+      border-radius: 10px;
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+    }
+
+    .section h2 {
+      font-size: 2rem;
+      margin-bottom: 10px;
+    }
+
+    .section p {
+      font-size: 1.1rem;
+      line-height: 1.5;
+    }
+
+    /* Updated Image Styles */
+    .image-container {
+      position: absolute;
+      /* Change to absolute for free movement */
+      cursor: move;
+      transition: transform 0.2s ease;
+      z-index: 100;
+    }
+
+    .image-container img {
+      width: 200px;
+      /* Increased size */
+      height: 200px;
+      /* Increased size */
+      border-radius: 50%;
+      border: 2px solid white;
+      box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
+    }
+
+    .image-container:hover {
+      transform: scale(1.1);
+    }
+
+    .left-image {
+      left: -250px;
+      top: 25%;
+      transform: translateY(-50%);
+    }
+
+    .right-image {
+      right: -250px;
+      top: 75%;
+      transform: translateY(-50%);
+    }
+
+    /* Footer Styles */
+    footer img {
+      max-width: 500px;
+      height: auto;
+      margin-bottom: 25px;
+      border: 3px solid white;
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+    }
+
+    /* Responsive Design */
+    @media (max-width: 600px) {
+      header h1 {
+        font-size: 2rem;
+      }
+
+      .section h2 {
+        font-size: 1.5rem;
+      }
+
+      .image-container img {
+        width: 80px;
+        /* Adjusted for smaller screens */
+        height: 80px;
+      }
+    }
+
+    header img {
+      cursor: pointer;
+      transition: transform 0.3s ease;
+    }
+
+    header img:hover {
+      transform: scale(1.1);
+    }
+  </style>
 </head>
 
 <body>
-  <div class="container">
-    <h2>About TalentHub</h2>
-    <p>We connect job seekers with top companies. Our platform is dedicated to finding the perfect job match for our
-      users.</p>
-  </div>
+  <!-- Header and main content remain the same -->
+  <header>
+    <a href="index.html">
+      <img src="images/logo_header.jpeg" alt="TalentHub Logo">
+    </a>
+    <h1>About TalentHub</h1>
+  </header>
+
+  <main>
+    <div class="section">
+      <h2>Welcome to TalentHub</h2>
+      <p>
+        TalentHub connects job seekers with employers, creating a bridge that facilitates the hiring process.
+        Our platform is designed to help talented individuals find their dream jobs while allowing companies to discover
+        the best candidates for their open positions.
+      </p>
+    </div>
+
+    <div class="image-container left-image" id="leftImage">
+      <a href="apply.html">
+        <img src="images/idea.jpeg" alt="Idea Image" />
+      </a>
+    </div>
+
+
+
+
+    <div class="section">
+      <h2>For Job Seekers</h2>
+      <p>
+        At TalentHub, we believe that everyone deserves a chance to showcase their skills and talents. Our platform
+        offers a variety of job opportunities across different industries, enabling job seekers to find positions that
+        match their skills and aspirations.
+      </p>
+    </div>
+
+    <div class="image-container right-image" id="rightImage">
+      <a href="dashboard.html">
+        <img src="images/music.jpeg" alt="Music Image" />
+      </a>
+    </div>
+
+    <div class="section">
+      <h2>For Employers</h2>
+      <p>
+        Employers can benefit from our extensive database of talented individuals. By posting job openings on TalentHub,
+        companies can attract qualified candidates who are eager to contribute to their success.
+      </p>
+    </div>
+  </main>
+
+  <footer>
+    <img src="images/logo_footer.jpeg" alt="TalentHub Footer Logo">
+  </footer>
+
+  <script>
+    // Enhanced dragging functionality
+    const dragElements = document.querySelectorAll('.image-container');
+
+    dragElements.forEach(element => {
+      let isDragging = false;
+      let currentX;
+      let currentY;
+      let initialX;
+      let initialY;
+      let xOffset = 0;
+      let yOffset = 0;
+
+      element.addEventListener('mousedown', dragStart);
+      element.addEventListener('mousemove', drag);
+      element.addEventListener('mouseup', dragEnd);
+      element.addEventListener('mouseleave', dragEnd);
+
+      function dragStart(e) {
+        initialX = e.clientX - xOffset;
+        initialY = e.clientY - yOffset;
+
+        if (e.target === element) {
+          isDragging = true;
+        }
+      }
+
+      function drag(e) {
+        if (isDragging) {
+          e.preventDefault();
+          currentX = e.clientX - initialX;
+          currentY = e.clientY - initialY;
+
+          xOffset = currentX;
+          yOffset = currentY;
+
+          setTranslate(currentX, currentY, element);
+        }
+      }
+
+      function dragEnd(e) {
+        initialX = currentX;
+        initialY = currentY;
+        isDragging = false;
+      }
+
+      function setTranslate(xPos, yPos, el) {
+        el.style.transform = `translate3d(${xPos}px, ${yPos}px, 0)`;
+      }
+    });
+  </script>
 </body>
 
 </html>

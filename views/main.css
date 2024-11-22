@@ -1,75 +1,150 @@
 body {
-  font-family: Arial, sans-serif;
+  font-family: 'Arial', sans-serif;
   margin: 0;
-  padding: 20px;
-  background-color: #f4f4f4;
+  padding: 0;
+  background: linear-gradient(135deg, #6a11cb, #2575fc);
+  color: #fff;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 100vh;
 }
 
-h1,
-h2 {
+h1 {
+  font-size: 3rem;
+  margin-bottom: 20px;
+}
+
+form {
+  background: rgba(255, 255, 255, 0.2);
+  padding: 20px 30px;
+  border-radius: 10px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+  max-width: 400px;
+  width: 100%;
+}
+
+form h2 {
+  font-size: 1.8rem;
+  margin-bottom: 20px;
+}
+
+form input,
+form textarea,
+form button,
+form label {
+  width: 100%;
+  margin-bottom: 15px;
+  padding: 10px;
+  border: none;
+  border-radius: 5px;
+  font-size: 1rem;
+  box-sizing: border-box;
+}
+
+form input,
+form textarea {
+  background: rgba(255, 255, 255, 0.8);
   color: #333;
 }
 
-button {
-  padding: 10px 15px;
-  margin: 5px;
-  background-color: #007bff;
-  color: white;
-  border: none;
+form textarea {
+  resize: none;
+  height: 80px;
+}
+
+form button {
+  background: #ffd700;
+  color: #333;
   cursor: pointer;
+  transition: all 0.3s ease-in-out;
 }
 
-button:hover {
-  background-color: #0056b3;
+form button:hover {
+  background: #ffa500;
+  transform: scale(1.05);
 }
 
-.job-card,
-.candidate-item,
-.job-item {
-  background: white;
-  padding: 15px;
-  margin: 10px 0;
-  border-radius: 5px;
-  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-}
-
-input,
-textarea {
-  width: 100%;
-  padding: 10px;
-  margin: 5px 0;
-  border: 1px solid #ccc;
-  border-radius: 4px;
-}
-
-#jobCards {
+form label {
   display: flex;
-  flex-wrap: wrap;
-}
-
-.job-card {
-  flex: 1 1 calc(33% - 20px);
-  margin: 10px;
-  padding: 15px;
-  border: 1px solid #ddd;
-  border-radius: 5px;
-  background-color: #fff;
-}
-
-.candidate-item,
-.job-item {
-  display: flex;
-  justify-content: space-between;
   align-items: center;
+  justify-content: start;
+  gap: 10px;
 }
 
-.candidate-item button,
-.job-item button {
-  margin-left: 10px;
+.form-page {
+  display: none;
+}
+
+.form-page.active {
+  display: block;
 }
 
 @media (max-width: 600px) {
-  .job-card {
-    flex: 1 1 100%;
+  h1 {
+    font-size: 2rem;
   }
+
+  form {
+    padding: 15px 20px;
+  }
+
+  form input,
+  form textarea,
+  form button {
+    font-size: 0.9rem;
+
+
+  }
+
+
+}
+
+header img {
+  max-width: 300px;
+  /* Set the maximum width */
+  height: auto;
+  /* Maintain aspect ratio */
+  margin-bottom: 25px;
+  border-radius: 60%;
+  /* Circular shape */
+  border: 3px solid white;
+  /* Add a border */
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+  /* Add a shadow for visibility */
+}
+
+.button-container {
+  display: flex;
+  justify-content: center;
+  gap: 20px;
+}
+
+.role-button {
+  padding: 15px 25px;
+  font-size: 1.2rem;
+  margin: 10px;
+  border: none;
+  border-radius: 5px;
+  background: #ffd700;
+  color: #333;
+  cursor: pointer;
+  transition: all 0.3s ease-in-out;
+}
+
+.role-button:hover {
+  background: #ffa500;
+  transform: scale(1.05);
+}
+
+/* Styling the logo */
+header img {
+  cursor: pointer;
+  transition: transform 0.3s ease;
+}
+
+header img:hover {
+  transform: scale(1.1);
 }
